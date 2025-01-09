@@ -10,29 +10,44 @@ const Registration = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
+    const [profilePic, setProfilePic] = useState(null);
+
+    const handleFileChange = (e) => {
+        setProfilePic(e.target.files[0]);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        setError('');
+        setSuccess('');
+        setIsSubmitting(true);
+    
         if (password !== confirmPassword) {
             setError('Пароли не совпадают');
+            setIsSubmitting(false);
             return;
         }
-
+    
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('username', username);
+        formData.append('first_name', firstName);
+        formData.append('last_name', lastName);
+        formData.append('password', password);
+    
+        // Add profile pic if exists
+        if (profilePic) {
+            formData.append('profile_pic', profilePic);
+        }
+    
         try {
             const response = await fetch('/api/users/register/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email,
-                    username,
-                    first_name: firstName,
-                    last_name: lastName,
-                    password,
-                }),
+                body: formData,
             });
-
+    
             if (response.ok) {
                 setSuccess('Регистрация прошла успешно!');
                 setEmail('');
@@ -41,12 +56,19 @@ const Registration = () => {
                 setLastName('');
                 setPassword('');
                 setConfirmPassword('');
+                setProfilePic(null);  
+                const profilePicInput = document.querySelector('input[type="file"]');
+                if (profilePicInput) {
+                    profilePicInput.value = ''; // Reset profile pic field
+                }
             } else {
                 const data = await response.json();
                 setError(data.error || 'Ошибка регистрации');
             }
         } catch (err) {
             setError('Произошла ошибка. Попробуйте снова.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -144,6 +166,18 @@ const Registration = () => {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                         required
+                    />
+                </div>
+
+                <div className="mb-4">
+                    <label htmlFor="profilePic" className="block text-sm font-medium text-gray-700">
+                        Фото профиля (опционально)
+                    </label>
+                    <input
+                        id="profilePic"
+                        type="file"
+                        onChange={handleFileChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     />
                 </div>
 
