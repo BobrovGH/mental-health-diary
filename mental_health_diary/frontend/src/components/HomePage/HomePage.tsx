@@ -1,25 +1,15 @@
-import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import SideBar from './SideBar';
+import SideBar from './layouts/SideBar';
 import NotesPage from './NotesPage';
 import ArtTherapyPage from './ArtTherapyPage';
 import AnalyticsPage from './AnalyticsPage';
 import UserPage from './UserPage';
 
 const HomePage: React.FC = () => {
-  const [username, setUsername] = useState<string | null>(null);
-
-  useEffect(() => {
-    const storedUsername = localStorage.getItem('username');
-    if (storedUsername) {
-      setUsername(storedUsername);
-    }
-  }, []);
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <SideBar username={username || 'Username'} />
-      
+      <SideBar/>
       <main className="flex-1 p-6">
         <Routes>
           <Route path="/" element={<NotesPage />} />

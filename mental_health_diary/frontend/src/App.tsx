@@ -2,21 +2,22 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './components/LoginPage/LoginPage';
 import HomePage from './components/HomePage/HomePage';
-import IsUserAuthenticated from './components/HomePage/IsUserAuthenticated';
+import { AuthProvider } from './utils/IsUserAuthenticated';
 import Registration from './components/LoginPage/Registration';
-
+import { CalendarDateProvider } from './utils/GetCalendarDate';
 
 function App() {
     return (
         <Router>
-            <Routes>
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<Registration />} />
-                <Route path="/*" element={
-                                            <IsUserAuthenticated>
-                                                <HomePage />
-                                            </IsUserAuthenticated>} />
-            </Routes>
+            <CalendarDateProvider>
+                <AuthProvider>
+                    <Routes>
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/register" element={<Registration />} />
+                        <Route path="/*" element={<HomePage />} />
+                    </Routes>
+                </AuthProvider>
+            </CalendarDateProvider>
         </Router>
     );
 }

@@ -4,3 +4,16 @@ local_venv/
 mental_health_diary/media/profile_pics/beaver-profile-pic_hMog90r.jpeg
 mental_health_diary/media/profile_pics/beaver-profile-pic_OPBfGZQ.jpeg
 mental_health_diary/media/profile_pics/beaver-profile-pic.jpeg
+mental_health_diary/.DS_Store
+mental_health_diary/diary/fixtures/initial_moods_emotions_influences.json
+mental_health_diary/diary/management/__init__.py
+mental_health_diary/diary/management/__pycache__/__init__.cpython-313.pyc
+mental_health_diary/diary/management/commands/__init__.py
+mental_health_diary/diary/management/commands/populate_notes.py
+mental_health_diary/diary/management/commands/__pycache__/__init__.cpython-313.pyc
+mental_health_diary/diary/management/commands/__pycache__/populate_notes.cpython-313.pyc
+mental_health_diary/media/influence_icons/счастье.png
+mental_health_diary/media/mood_icons/счастье.png
+mental_health_diary/media/profile_pics/632x632bb-2.jpeg
+mental_health_diary/media/profile_pics/ab67616d0000b273d688b951a19f48941682e026.jpeg
+mental_health_diary/.DS_Store

@@ -3,7 +3,7 @@ import React from 'react';
 const NotesPage: React.FC = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-semibold">Заметки</h2>
+      <h2 className="text-2xl font-semibold">Арт-терапия</h2>
       <p>Здесь всё будет, но потом</p>
     </div>
   );

@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
-    'users', #signup, signin, reset password etc.
+    'users', #signup, signin, reset password, account page
+    'diary', #taking and storing notes
+    'analytics', #gather and analize data
 ]
 
 MIDDLEWARE = [
@@ -110,12 +112,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-RU'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
 
 
@@ -149,34 +151,6 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'WARNING',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'users': {  # Имя совпадает с __name__ в файле
-            'handlers': ['console'],
-            'level': 'DEBUG',  # Отображаем отладочные сообщения
-            'propagate': False,
-        },
-    },
-}
-
-AUTH_USER_MODEL = 'users.UserEmailAuth'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

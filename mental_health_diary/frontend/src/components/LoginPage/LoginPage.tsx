@@ -1,30 +1,27 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../utils/IsUserAuthenticated';
 
 const LoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const { login } = useAuth();
     const navigate = useNavigate();
-
+  
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const response = await fetch('http://127.0.0.1:8000/api/users/login/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }), // Send username and password
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            console.log('Login successful', data);
-            localStorage.setItem('access', data.access);
-            localStorage.setItem('refresh', data.refresh);
-            localStorage.setItem('username', username);
-            navigate('/');
-        } else {
-            const errorData = await response.json();
-            console.error('Login failed:', errorData);
-        }
+      e.preventDefault();
+      const response = await fetch('http://127.0.0.1:8000/api/users/login/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        login({ access: data.access, refresh: data.refresh, username });
+      } else {
+        console.error('Login failed');
+      }
     };
 
     return (
