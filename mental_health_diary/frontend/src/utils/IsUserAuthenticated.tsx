@@ -1,6 +1,6 @@
-// context/AuthContext.tsx
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { checkAuthStatus } from "./api";
 
 interface AuthContextProps {
   isAuthenticated: boolean;
@@ -16,34 +16,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [username, setUsername] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const accessToken = localStorage.getItem('access');
-    const storedUsername = localStorage.getItem('username');
-
-    if (accessToken) {
-      setIsAuthenticated(true);
-      setUsername(storedUsername);
+  const updateAuthStatus = async () => {
+    try {
+      const data = await checkAuthStatus();
+      setIsAuthenticated(data.isAuthenticated);
+      setUsername(data.username);
+    } catch {
+      setIsAuthenticated(false);
+      setUsername(null);
+      logout
     }
+  };
+
+  useEffect(() => {
+    updateAuthStatus();
   }, []);
 
   const login = (data: { access: string; refresh: string; username: string }) => {
-    localStorage.setItem('access', data.access);
-    localStorage.setItem('refresh', data.refresh);
-    localStorage.setItem('username', data.username);
-
+    localStorage.setItem("access", data.access);
+    localStorage.setItem("refresh", data.refresh);
+    localStorage.setItem("username", data.username);
     setIsAuthenticated(true);
     setUsername(data.username);
-    navigate('/');
+    navigate("/");
+    updateAuthStatus();
   };
 
   const logout = () => {
-    localStorage.removeItem('access');
-    localStorage.removeItem('refresh');
-    localStorage.removeItem('username');
-
+    localStorage.clear();
     setIsAuthenticated(false);
     setUsername(null);
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -56,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

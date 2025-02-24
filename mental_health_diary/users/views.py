@@ -8,15 +8,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.parsers import MultiPartParser #for profile pic
 from django.contrib.auth import get_user_model, authenticate
-from .models import ProfilePic
 from .serializers import UserProfileSerializer
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from django.contrib.auth.models import User
-from rest_framework import status
 from .utils import register_user
-
 
 User = get_user_model()
 
@@ -52,6 +45,7 @@ class LoginView(TokenObtainPairView):
             return Response({'error': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
+# Logout view
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -112,14 +106,22 @@ def change_password(request):
 
     # Validate old password using check_password
     if not user.check_password(old_password):  # Use the method provided by Django's User model
-        return Response({"error": "Неверный старый пароль"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Wrong old password"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Validate new password confirmation
     if new_password != confirm_password:
-        return Response({"error": "Новые пароли не совпадают"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "New passwords don't match"}, status=status.HTTP_400_BAD_REQUEST)
 
     # Update the password
     user.set_password(new_password)
     user.save()
 
-    return Response({"success": "Пароль успешно изменен"}, status=status.HTTP_200_OK)
+    return Response({"success": "New password is set"}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny]) 
+def check_if_authenticated(request):
+    if request.user.is_authenticated:
+        return Response({"isAuthenticated": True, "username": request.user.username})
+    else:
+        return Response({"isAuthenticated": False, "username": None})

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 const ChangePassword: React.FC = () => {
+    const apiUrl = import.meta.env.VITE_API_URL;
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -18,7 +19,7 @@ const ChangePassword: React.FC = () => {
         }
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/users/change_password/', {
+            const response = await fetch(`${apiUrl}/users/change_password/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

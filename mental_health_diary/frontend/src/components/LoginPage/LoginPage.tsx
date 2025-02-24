@@ -1,27 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../utils/IsUserAuthenticated';
 
 const LoginPage: React.FC = () => {
+    const apiUrl = import.meta.env.VITE_API_URL;
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const { login } = useAuth();
+    const { isAuthenticated, login } = useAuth();
     const navigate = useNavigate();
-  
+
+    // If the user is already logged in, redirect them to the home page
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/');
+        }
+    }, [isAuthenticated, navigate]);
+
     const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      const response = await fetch('http://127.0.0.1:8000/api/users/login/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-  
-      if (response.ok) {
-        const data = await response.json();
-        login({ access: data.access, refresh: data.refresh, username });
-      } else {
-        console.error('Login failed');
-      }
+        e.preventDefault();
+        
+        // Request to login
+        const response = await fetch(`${apiUrl}/users/login/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Login the user and redirect to the home page
+            login({ access: data.access, refresh: data.refresh, username });
+        } else {
+            console.error('Login failed');
+        }
     };
 
     return (

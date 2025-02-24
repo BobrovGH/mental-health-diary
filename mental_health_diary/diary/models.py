@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 # Create your models here.
 User = get_user_model()
 
+# Note of user with selected mood, emotions, influences
 class Note(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField()
@@ -19,6 +20,7 @@ class Note(models.Model):
 
 class Mood(models.Model):
     mood_name = models.CharField(max_length=50)
+    color = models.CharField(max_length=7, default="red")
 
     def __str__(self):
         return self.mood_name
@@ -27,13 +29,16 @@ class Emotion(models.Model):
     emotion_name = models.CharField(max_length=50)
     emotion_type = models.CharField(max_length=50)
     icon = models.ImageField(upload_to='mood_icons/')
+    color = models.CharField(max_length=7, default="green")
 
     def __str__(self):
         return self.emotion_name
 
 class Influence(models.Model):
     influence_name = models.CharField(max_length=50)
+    influence_type = models.CharField(max_length=50)
     icon = models.ImageField(upload_to='influence_icons/')
+    color = models.CharField(max_length=7, default="blue")
 
     def __str__(self):
         return self.influence_name

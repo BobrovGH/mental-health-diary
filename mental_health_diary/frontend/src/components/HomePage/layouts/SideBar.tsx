@@ -2,18 +2,36 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import CalendarWidget from '../widgets/CalendarWidget';
 import { useAuth } from '../../../utils/IsUserAuthenticated';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretUp } from '@fortawesome/free-solid-svg-icons';
 
 const SideBar: React.FC = () => {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const { username, logout } = useAuth();
   const navigate = useNavigate();
   const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
+
+   // When scrolled more than 100px, show up button
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollToTop(window.pageYOffset > 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   useEffect(() => {
     // Fetch the user's profile picture based on the username
     const fetchProfilePic = async () => {
       if (username) {
         try {
-          const response = await fetch(`http://127.0.0.1:8000/api/users/user_data?username=${username}`, {
+          const response = await fetch(`${apiUrl}/users/user_data?username=${username}`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('access')}`,
             },
@@ -40,7 +58,7 @@ const SideBar: React.FC = () => {
 
       {/* Navigation Links */}
       <nav className="flex flex-col mb-4">
-        <Link to="/notes" className="text-lg text-gray-700 py-2 hover:bg-gray-200">
+        <Link to="/" className="text-lg text-gray-700 py-2 hover:bg-gray-200">
           Заметки
         </Link>
         <Link to="/analytics" className="text-lg text-gray-700 py-2 hover:bg-gray-200">
@@ -65,6 +83,15 @@ const SideBar: React.FC = () => {
           Выйти
         </button>
       </div>
+      {/* Кнопка "Наверх" */}
+      {showScrollToTop && (
+          <button
+            onClick={scrollToTop}
+            className="fixed bottom-4 left-4 bg-white hover:bg-gray-200 text-gray-400 font-bold py-2 px-4 rounded"
+          >
+            <FontAwesomeIcon icon={faCaretUp}  /> Наверх
+          </button>
+        )}
     </aside>
   );
 };

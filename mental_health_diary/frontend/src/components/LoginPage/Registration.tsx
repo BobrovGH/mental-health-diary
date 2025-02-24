@@ -84,13 +84,14 @@ const Registration = () => {
 
                 <div className="mb-4">
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                        Email
+                        Email <span className='text-red-500'>*</span>
                     </label>
                     <input
                         id="email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        placeholder='example@mail.ru'
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                         required
                     />
@@ -98,13 +99,14 @@ const Registration = () => {
 
                 <div className="mb-4">
                     <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                        Имя пользователя
+                        Имя пользователя <span className='text-red-500'>*</span>
                     </label>
                     <input
                         id="username"
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                        placeholder='BestUser'
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                         required
                     />
@@ -112,13 +114,14 @@ const Registration = () => {
 
                 <div className="mb-4">
                     <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                        Имя
+                        Имя <span className='text-red-500'>*</span>
                     </label>
                     <input
                         id="firstName"
                         type="text"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
+                        placeholder='Иван'
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                         required
                     />
@@ -126,13 +129,14 @@ const Registration = () => {
 
                 <div className="mb-4">
                     <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                        Фамилия
+                        Фамилия <span className='text-red-500'>*</span>
                     </label>
                     <input
                         id="lastName"
                         type="text"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
+                        placeholder='Иванов'
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                         required
                     />
@@ -140,7 +144,7 @@ const Registration = () => {
 
                 <div className="mb-4">
                     <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                        Пароль
+                        Пароль <span className='text-red-500'>*</span>
                     </label>
                     <input
                         id="password"
@@ -157,7 +161,7 @@ const Registration = () => {
                         htmlFor="confirmPassword"
                         className="block text-sm font-medium text-gray-700"
                     >
-                        Подтвердите пароль
+                        Подтвердите пароль <span className='text-red-500'>*</span>
                     </label>
                     <input
                         id="confirmPassword"
@@ -171,7 +175,7 @@ const Registration = () => {
 
                 <div className="mb-4">
                     <label htmlFor="profilePic" className="block text-sm font-medium text-gray-700">
-                        Фото профиля (опционально)
+                        Фото профиля
                     </label>
                     <input
                         id="profilePic"

@@ -5,6 +5,7 @@ import { getCalendarDate } from '../../../utils/GetCalendarDate';
 
 const CalendarWidget: React.FC = () => {
   const { setSelectedDate } = getCalendarDate();
+  const today = new Date();
 
   const handleDateChange = (date: Date) => {
     const formattedDate = date.getFullYear() + '-' +
@@ -23,6 +24,7 @@ const CalendarWidget: React.FC = () => {
         prev2Label={null}
         next2Label={null}
         onChange={handleDateChange}
+        maxDate={today}
       />
     </div>
   );
