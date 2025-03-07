@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { changePassword } from '../../utils/api';
 
 const ChangePassword: React.FC = () => {
-    const apiUrl = import.meta.env.VITE_API_URL;
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -12,39 +12,26 @@ const ChangePassword: React.FC = () => {
         e.preventDefault();
         setError('');
         setSuccess('');
-
+      
         if (newPassword !== confirmPassword) {
-            setError('Пароли не совпадают.');
-            return;
+          setError('Пароли не совпадают.');
+          return;
         }
-
+      
         try {
-            const response = await fetch(`${apiUrl}/users/change_password/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('access')}`,
-                },
-                body: JSON.stringify({
-                    old_password: currentPassword, // Match this with the backend key
-                    new_password: newPassword,
-                    confirm_password: confirmPassword, // Include confirm_password for better validation
-                }),                
-            });
-
-            if (response.ok) {
-                setSuccess('Пароль успешно изменен.');
-                setCurrentPassword('');
-                setNewPassword('');
-                setConfirmPassword('');
-            } else {
-                const data = await response.json();
-                setError(data.error || 'Ошибка при смене пароля.');
-            }
+          const response = await changePassword(currentPassword, newPassword, confirmPassword);
+          if (response.ok) {
+            setSuccess('Пароль успешно изменен.');
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+          } else {
+            setError(response.error || 'Ошибка при смене пароля.');
+          }
         } catch (err) {
-            setError('Произошла ошибка. Попробуйте снова.');
+          setError('Произошла ошибка. Попробуйте снова.');
         }
-    };
+      };
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-lg">

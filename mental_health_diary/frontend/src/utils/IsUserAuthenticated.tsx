@@ -24,7 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {
       setIsAuthenticated(false);
       setUsername(null);
-      logout
+      logout();
     }
   };
 

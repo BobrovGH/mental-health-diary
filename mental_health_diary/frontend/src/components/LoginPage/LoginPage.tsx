@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../utils/IsUserAuthenticated';
+import { loginUser } from '../../utils/api';
 
 const LoginPage: React.FC = () => {
-    const apiUrl = import.meta.env.VITE_API_URL;
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const { isAuthenticated, login } = useAuth();
+    const [error, setError] = useState(''); // this is shown but since page reloads user cant see it
     const navigate = useNavigate();
 
     // If the user is already logged in, redirect them to the home page
@@ -18,21 +19,21 @@ const LoginPage: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        // Request to login
-        const response = await fetch(`${apiUrl}/users/login/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
-        });
+        setError(""); // Clear previous errors
 
-        if (response.ok) {
-            const data = await response.json();
-            
-            // Login the user and redirect to the home page
-            login({ access: data.access, refresh: data.refresh, username });
-        } else {
-            console.error('Login failed');
+        try {
+            const result = await loginUser(username, password);
+            if (result.success) {
+                login({ access: result.access, refresh: result.refresh, username: result.username });
+            } else {
+                setError("Неверный логин или пароль");
+                setUsername("");
+                setPassword("");
+            }
+        } catch (error) {
+            setError("Произошла ошибка при входе");
+            setUsername("");
+            setPassword("");
         }
     };
 
@@ -46,6 +47,7 @@ const LoginPage: React.FC = () => {
 
                 <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm mx-auto">
                     <h2 className="text-2xl font-semibold text-center mb-4">Авторизация</h2>
+                    {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
                     <div className="mb-4">
                         <label htmlFor="username" className="block text-sm font-medium text-gray-700 text-left">

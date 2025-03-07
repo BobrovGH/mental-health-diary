@@ -16,8 +16,10 @@ def filter_by_user_and_period(request, model_data):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def oldest_note_date(request):
-    oldest_note = Note.objects.order_by("date").values_list("date", flat=True).first()
-    return Response({"oldestNoteDate": str(oldest_note) if oldest_note else "2025-01-01"})
+    user_id = request.user.id
+    oldest_note = Note.objects.filter(user_id=user_id).order_by("date").values_list("date", flat=True).first()
+    print(oldest_note)
+    return Response({"oldestNoteDate": str(oldest_note) if oldest_note else ""})
 
 # get frequency of users' notes
 @api_view(['GET'])

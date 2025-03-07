@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { getUserNotes, deleteNote } from "../../utils/api";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faEye, faSquareXmark } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faEye, faSquareXmark, faEllipsis } from '@fortawesome/free-solid-svg-icons';
 
 interface Emotion {
   name: string;
@@ -28,42 +29,45 @@ interface NotesByDate {
 }
 
 const NotesPage: React.FC = () => {
-  const apiUrl = import.meta.env.VITE_API_URL;
-
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [notesByDate, setNotesByDate] = useState<NotesByDate>({});
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Function to open the modal with note details
+  // Functions to open and close the modal with note details
   const openModal = (note: Note, date: string) => {
     setSelectedNote(note);
     setSelectedDate(date)
   };
-
-  // Function to close the modal
   const closeModal = () => {
     setSelectedNote(null);
   };
-  
-  const deleteNote = async (noteId: number, date: string) => {
+
+  const handleDeleteNote = async (noteId: number) => {
     try {
-      const response = await fetch(`${apiUrl}/diary/delete_note/${noteId}/`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access')}`,
-          'Content-Type': 'application/json',
-        },
+      await deleteNote(noteId);
+      
+      // Update notes page when one is deleted
+      setNotesByDate(prevNotesByDate => {
+        const updatedNotesByDate = { ...prevNotesByDate };
+        
+        for (const date in updatedNotesByDate) {
+          if (updatedNotesByDate.hasOwnProperty(date)) {
+            updatedNotesByDate[date] = updatedNotesByDate[date].filter(note => note.id !== noteId);
+            
+            if (updatedNotesByDate[date].length === 0) {
+              delete updatedNotesByDate[date];
+            }
+          }
+        }
+        
+        return updatedNotesByDate;
       });
-      if (!response.ok) {
-        throw new Error('Failed to delete note');
-      }
     } catch (err: any) {
       setError(err.message);
     }
   };
-
-  const [notesByDate, setNotesByDate] = useState<NotesByDate>({});
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
   const formatDateRU = (date: string) => {
     return date.split("-").reverse().join(".");
@@ -71,15 +75,7 @@ const NotesPage: React.FC = () => {
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const response = await fetch(`${apiUrl}/diary/get_notes/`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('access')}`,
-          },
-        });
-        if (!response.ok) {
-          throw new Error('Failed to fetch notes');
-        }
-        const data: NotesByDate = await response.json();
+        const data = await getUserNotes();
         setNotesByDate(data);
       } catch (err: any) {
         setError(err.message);
@@ -92,39 +88,53 @@ const NotesPage: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <p>Загрузка...</p>;
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <p>Ошибка: {error}</p>;
+  }
+
+  if (Object.keys(notesByDate).length === 0) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="flex justify-between w-full items-center mb-4">
+          <h2 className="text-2xl font-semibold mb-4">Заметки</h2>
+          <button
+            className="mb-4 px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none"
+          >
+            <Link to="/notes/create">Добавить новую заметку</Link>
+          </button>
+    </div>
+    <p className="text-lg">У вас нет заметок</p>
+    </div>
+    
+    );
   }
 
   return (
     <div className="flex gap-6">
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold mb-4">Заметки</h2>
-        <button
-          className="mb-4 px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none"
-        >
-          <Link to="/notes/create">Добавить новую заметку</Link>
-        </button>
+      <div className="flex-grow max-w-[87%] bg-white p-6 rounded-lg shadow-lg">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-semibold mb-4">Заметки</h2>
+          <button
+            className="mb-4 px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none"
+          >
+            <Link to="/notes/create">Добавить новую заметку</Link>
+          </button>
         </div>
-
-        {Object.keys(notesByDate).length === 0 ? (
-          <p>У вас нет заметок</p>
-        ) : (
+        {(
           Object.entries(notesByDate).map(([date, notes]) => (
             <div key={date} id={date} className="mb-6">
               <h3 className="text-lg font-semibold mb-2">{formatDateRU(date)}</h3>
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-gray-200 text-left">
-                    <th className="p-2 w-[10%]">Время</th>
-                    <th className="p-2 w-[20%]">Настроение</th>
+                    <th className="p-2 w-[5%]">Время</th>
+                    <th className="p-2 w-[15%]">Настроение</th>
                     <th className="p-2 w-[20%]">Эмоции</th>
-                    <th className="p-2 w-[20%]">Влияния</th>
-                    <th className="p-2 w-[20%]">Заметка</th>
+                    <th className="p-2 w-[16%]">Влияния</th>
+                    <th className="p-2 w-[34%]">Заметка</th>
                     <th className="p-2 w-[10%]"></th>
                   </tr>
                 </thead>
@@ -138,7 +148,8 @@ const NotesPage: React.FC = () => {
                       <td className="p-2">
                         <div className="flex gap-1">
                           {note.emotions.length > 0 ? (
-                            note.emotions.map((emotion, index) =>
+                            <>
+                            {note.emotions.slice(0, 4).map((emotion, index) =>
                               emotion.icon ? (
                                 <img
                                   key={index}
@@ -152,7 +163,13 @@ const NotesPage: React.FC = () => {
                                   {emotion.name}
                                 </span>
                               )
-                            )
+                            )}
+                            {note.emotions.length > 4 && (
+                              <button
+                              className="fa-solid fa-user px-2 py-1 bg-gray-200 text-white rounded-md hover:bg-gray-300"
+                              onClick={() => openModal(note, formatDateRU(date))}><FontAwesomeIcon icon={faEllipsis} /></button>
+                            )}
+                            </>
                           ) : (
                             "—"
                           )}
@@ -163,7 +180,8 @@ const NotesPage: React.FC = () => {
                       <td className="p-2">
                         <div className="flex gap-1">
                           {note.influences.length > 0 ? (
-                            note.influences.map((influence, index) =>
+                            <>
+                            {note.influences.slice(0, 3).map((influence, index) =>
                               influence.icon ? (
                                 <img
                                   key={index}
@@ -177,21 +195,28 @@ const NotesPage: React.FC = () => {
                                   {influence.name}
                                 </span>
                               )
-                            )
+                            )}
+                            {note.influences.length > 3 && (
+                              <button
+                              className="fa-solid fa-user px-2 py-1 bg-gray-200 text-white rounded-md hover:bg-gray-300"
+                              onClick={() => openModal(note, formatDateRU(date))}><FontAwesomeIcon icon={faEllipsis} /></button>
+                            )}
+                            </>
                           ) : (
                             "—"
                           )}
                         </div>
                       </td>
 
-                      <td className="p-2">{note.text_note || "—"}</td>
+                      <td className="p-2">
+                        <div className="line-clamp-2">{note.text_note || "—"}</div></td>
                       <td className="p-2 flex gap-2">
                         <button
                           className="fa-solid fa-user px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                           onClick={() => openModal(note, formatDateRU(date))}><FontAwesomeIcon icon={faEye} /></button>
-                        <button 
-                        className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
-                        onClick={() => deleteNote(note.id, date)}><FontAwesomeIcon icon={faTrash} /></button></td>
+                        <button
+                          className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                          onClick={() => handleDeleteNote(note.id)}><FontAwesomeIcon icon={faTrash} /></button></td>
                     </tr>
                   ))}
                 </tbody>
@@ -202,21 +227,23 @@ const NotesPage: React.FC = () => {
       </div>
 
       {/* SideBar */}
-      <aside className="w-32 right-0 top-0 h-full bg-white shadow-lg overflow-auto p-4">
-        <h3 className="text-lg font-bold mb-2">Даты</h3>
-        <ul className="space-y-2">
-          {Object.keys(notesByDate).map((date) => (
-            <li key={date}>
-              <a
-                href={`#${date}`}
-                className="block p-2 rounded-md hover:bg-gray-200 transition"
-              >
-                {formatDateRU(date)}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </aside>
+      {Object.keys(notesByDate).length > 0 && (
+        <aside className="w-32 right-0 top-0 h-full bg-white rounded-lg shadow-lg overflow-auto p-4">
+          <h3 className="text-lg font-bold mb-2">Даты</h3>
+          <ul className="space-y-2">
+            {Object.keys(notesByDate).map((date) => (
+              <li key={date}>
+                <a
+                  href={`#${date}`}
+                  className="block p-2 rounded-md hover:bg-gray-200 transition"
+                >
+                  {formatDateRU(date)}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
 
       {/* Modal for Viewing Note */}
       {selectedNote && (
@@ -225,7 +252,7 @@ const NotesPage: React.FC = () => {
           onClick={closeModal} // Close when clicking outside
         >
           <div
-            className="bg-white p-6 rounded-lg shadow-lg w-96"
+            className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl"
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
           >
             <div className="flex justify-between items-center mb-4">
@@ -293,7 +320,7 @@ const NotesPage: React.FC = () => {
 
             {/* Note Text */}
             <p className="mt-2">
-              <strong>Заметка</strong> 
+              <strong>Заметка</strong>
             </p>
             {selectedNote.text_note || "—"}
           </div>

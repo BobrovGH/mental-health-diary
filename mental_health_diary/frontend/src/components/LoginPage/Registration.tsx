@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { registerUser } from '../../utils/api';
 
 const Registration = () => {
     const [email, setEmail] = useState('');
@@ -41,14 +42,10 @@ const Registration = () => {
         if (profilePic) {
             formData.append('profile_pic', profilePic);
         }
-    
+        
+        const response = await registerUser(formData);
         try {
-            const response = await fetch('/api/users/register/', {
-                method: 'POST',
-                body: formData,
-            });
-    
-            if (response.ok) {
+            if (response.success) {
                 setSuccess('Регистрация прошла успешно!');
                 setEmail('');
                 setUsername('');

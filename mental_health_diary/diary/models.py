@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 # Create your models here.
 User = get_user_model()
 
-# Note of user with selected mood, emotions, influences
+# User's note with selected mood, emotions, influences
 class Note(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField()

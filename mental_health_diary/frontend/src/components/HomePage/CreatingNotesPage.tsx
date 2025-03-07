@@ -17,6 +17,7 @@ const CreatingNotesPage: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState<string>(() =>
     new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', hour12: false })
   );
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Conditional button label based on logic
   const isToday = selectedDate === new Date().toISOString().split('T')[0];
@@ -79,7 +80,7 @@ const CreatingNotesPage: React.FC = () => {
   const handleAddNote = async () => {
     const dateToPass = selectedDate;
     const timeToPass = selectedMoodType === 'with a timestamp' ? selectedTime : null;
-    console.log(timeToPass)
+
     try {
       await createNote({
         date: dateToPass,
@@ -89,6 +90,10 @@ const CreatingNotesPage: React.FC = () => {
         influences: selectedInfluences,
         text_note: textNote,
       });
+
+      // Success message
+      setSuccessMessage('Добавлена новая заметка');
+      setTimeout(() => setSuccessMessage(null), 3000);
 
       // Erase fields
       setSelectedMood('');
@@ -153,7 +158,7 @@ const CreatingNotesPage: React.FC = () => {
                 type="time"
                 value={selectedTime}
                 onChange={handleTimeChange}
-                className="w-24 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-26 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                 max={maxTime}
               />
               {isToday && (
@@ -173,7 +178,7 @@ const CreatingNotesPage: React.FC = () => {
 
       {/* Mood */}
       < div className="mb-4" >
-        <label className="text-md font-semibold mb-2">Настроение</label> {/* add here little button with label сейчас and this button is showed only when date on the calendar is today and it changes time in the picker to the current time */}
+        <label className="text-md font-semibold mb-2">Настроение</label>
         <select
           value={selectedMood}
           onChange={(e) => setSelectedMood(e.target.value)}
@@ -257,6 +262,11 @@ const CreatingNotesPage: React.FC = () => {
         />
       </div>
 
+      {/* Success message */}
+      {successMessage && (
+        <p className="text-green-500 text-center mb-4">{successMessage}</p>
+      )}
+
       {/* Buttons */}
       <div className="flex justify-end gap-4">
         <button
@@ -274,7 +284,11 @@ const CreatingNotesPage: React.FC = () => {
         <button
           type="button"
           onClick={handleAddNote}
-          className="px-4 py-2 bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 focus:outline-none"
+          className={`px-4 py-2 text-white font-semibold rounded-md focus:outline-none ${!selectedMood || selectedEmotions.length === 0
+              ? 'bg-orange-300'
+              : 'bg-orange-500 hover:bg-orange-600'
+            }`}
+          disabled={!selectedMood || selectedEmotions.length === 0}
         >
           Добавить заметку
         </button>

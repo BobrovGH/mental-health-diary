@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../utils/IsUserAuthenticated';
+import { getUserData } from '../../utils/api';
 import { dayTitle, daysSince } from '../../utils/countAndDisplayDays';
 import ChangePassword from './ChangePassword'; // Import the new component
 
@@ -17,24 +18,14 @@ const UserPage: React.FC = () => {
 
     const fetchUserData = async () => {
         if (isAuthenticated && username) {
-            try {
-                const response = await fetch(`/api/users/user_data?username=${username}`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('access')}`,
-                    },
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    setUserData(data);
-                } else {
-                    console.error('Failed to fetch user data');
-                }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
+          try {
+            const data = await getUserData(username);
+            setUserData(data);
+          } catch (error) {
+            console.error("Error fetching user data:", error);
+          }
         }
-    };
+      };
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -69,8 +60,8 @@ const UserPage: React.FC = () => {
             <div className="mt-6">
                 <p>Электронная почта: {userData.email || 'email@example.com'}</p>
                 <p>
-                    Присоединился {daysSince(userData.date_joined)}{' '}
-                    {dayTitle(daysSince(userData.date_joined))} назад
+                    Заботится о ментальном благополучии уже {daysSince(userData.date_joined)}{' '}
+                    {dayTitle(daysSince(userData.date_joined))}
                 </p>
             </div>
             <div className="mt-6 space-y-4">

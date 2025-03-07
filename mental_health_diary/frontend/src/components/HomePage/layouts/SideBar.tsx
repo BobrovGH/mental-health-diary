@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import CalendarWidget from '../widgets/CalendarWidget';
 import { useAuth } from '../../../utils/IsUserAuthenticated';
+import { getUserData } from '../../../utils/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretUp } from '@fortawesome/free-solid-svg-icons';
 
 const SideBar: React.FC = () => {
-  const apiUrl = import.meta.env.VITE_API_URL;
   const { username, logout } = useAuth();
   const navigate = useNavigate();
   const [profilePic, setProfilePic] = useState<string | null>(null);
@@ -31,18 +31,10 @@ const SideBar: React.FC = () => {
     const fetchProfilePic = async () => {
       if (username) {
         try {
-          const response = await fetch(`${apiUrl}/users/user_data?username=${username}`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('access')}`,
-            },
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            setProfilePic(data.profile_pic); // Store the profile picture URL
-          }
+          const data = await getUserData(username);
+          setProfilePic(data.profile_pic);
         } catch (error) {
-          console.error('Error fetching user profile picture:', error);
+          console.error("Error fetching user profile picture:", error);
         }
       }
     };
