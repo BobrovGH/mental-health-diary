@@ -91,7 +91,7 @@ class RegisterView(APIView):
 @permission_classes([IsAuthenticated])
 def user_profile_data(request):
     user = request.user
-    serializer = UserProfileSerializer(user)
+    serializer = UserProfileSerializer(user, context={'request': request})
     return Response(serializer.data)
 
 @api_view(['POST'])

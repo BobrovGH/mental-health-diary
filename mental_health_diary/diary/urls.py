@@ -1,7 +1,5 @@
 from django.urls import path
 from diary.views import get_diary_data, create_note, get_user_notes, delete_note
-from django.conf import settings
-from django.conf.urls.static import static
 
 urlpatterns = [
     path('data/', get_diary_data, name='diary_data'),

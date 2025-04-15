@@ -4,7 +4,7 @@ import CalendarWidget from '../widgets/CalendarWidget';
 import { useAuth } from '../../../utils/IsUserAuthenticated';
 import { getUserData } from '../../../utils/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretUp } from '@fortawesome/free-solid-svg-icons';
+import { faCaretUp, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 const SideBar: React.FC = () => {
   const { username, logout } = useAuth();
@@ -12,7 +12,7 @@ const SideBar: React.FC = () => {
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [showScrollToTop, setShowScrollToTop] = useState(false);
 
-   // When scrolled more than 100px, show up button
+  // When scrolled more than 100px, show up button
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollToTop(window.pageYOffset > 100);
@@ -45,7 +45,7 @@ const SideBar: React.FC = () => {
   return (
     <aside className="w-64 bg-white shadow-lg p-4">
       <div className="mb-4">
-      <CalendarWidget/>
+        <CalendarWidget/>
       </div>
 
       {/* Navigation Links */}
@@ -72,18 +72,18 @@ const SideBar: React.FC = () => {
           <label className="cursor-pointer text-gray-700 hover:underline">{username || 'Username'}</label>
         </div>
         <button onClick={logout} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-          Выйти
+          <FontAwesomeIcon icon={faRightFromBracket} />
         </button>
       </div>
       {/* Кнопка "Наверх" */}
       {showScrollToTop && (
-          <button
-            onClick={scrollToTop}
-            className="fixed bottom-4 left-4 bg-white hover:bg-gray-200 text-gray-400 font-bold py-2 px-4 rounded"
-          >
-            <FontAwesomeIcon icon={faCaretUp}  /> Наверх
-          </button>
-        )}
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-4 left-4 bg-white hover:bg-gray-200 text-gray-400 font-bold py-2 px-4 rounded"
+        >
+          <FontAwesomeIcon icon={faCaretUp}  /> Наверх
+        </button>
+      )}
     </aside>
   );
 };

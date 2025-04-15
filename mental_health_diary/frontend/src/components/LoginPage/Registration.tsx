@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser } from '../../utils/api';
+import { registerUser, loginUser } from '../../utils/api';
+import { useAuth } from '../../utils/IsUserAuthenticated';
 
 const Registration = () => {
     const [email, setEmail] = useState('');
@@ -13,36 +14,39 @@ const Registration = () => {
     const [success, setSuccess] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
-    const [profilePic, setProfilePic] = useState(null);
+    const [profilePic, setProfilePic] = useState<File | null>(null);
+    const { login } = useAuth();
 
-    const handleFileChange = (e) => {
-        setProfilePic(e.target.files[0]);
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setProfilePic(e.target.files[0]);
+        }
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError('');
         setSuccess('');
         setIsSubmitting(true);
-    
+
         if (password !== confirmPassword) {
             setError('Пароли не совпадают');
             setIsSubmitting(false);
             return;
         }
-    
+
         const formData = new FormData();
         formData.append('email', email);
         formData.append('username', username);
         formData.append('first_name', firstName);
         formData.append('last_name', lastName);
         formData.append('password', password);
-    
+
         // Add profile pic if exists
         if (profilePic) {
             formData.append('profile_pic', profilePic);
         }
-        
+
         const response = await registerUser(formData);
         try {
             if (response.success) {
@@ -53,14 +57,21 @@ const Registration = () => {
                 setLastName('');
                 setPassword('');
                 setConfirmPassword('');
-                setProfilePic(null);  
-                const profilePicInput = document.querySelector('input[type="file"]');
+                setProfilePic(null);
+
+                const profilePicInput = document.querySelector<HTMLInputElement>('input[type="file"]');
                 if (profilePicInput) {
-                    profilePicInput.value = ''; // Reset profile pic field
+                    profilePicInput.value = '';
                 }
+                const result = await loginUser(username, password);
+                if (result.success) {
+                    login({ access: result.access, refresh: result.refresh, username: result.username });
+                }
+
             } else {
-                const data = await response.json();
-                setError(data.error || 'Ошибка регистрации');
+                // Handle API error response
+                const data = response.data || response.message;
+                setError(data || 'Ошибка регистрации');
             }
         } catch (err) {
             setError('Произошла ошибка. Попробуйте снова.');
@@ -74,6 +85,7 @@ const Registration = () => {
             <form
                 onSubmit={handleSubmit}
                 className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm"
+                autoComplete="on"
             >
                 <h2 className="text-2xl font-semibold text-center mb-4">Регистрация</h2>
                 {error && <p className="text-red-500 text-center mb-4">{error}</p>}
@@ -85,6 +97,7 @@ const Registration = () => {
                     </label>
                     <input
                         id="email"
+                        name="email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -100,6 +113,7 @@ const Registration = () => {
                     </label>
                     <input
                         id="username"
+                        name="username"
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
@@ -146,6 +160,7 @@ const Registration = () => {
                     <input
                         id="password"
                         type="password"
+                        name="new-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -163,6 +178,7 @@ const Registration = () => {
                     <input
                         id="confirmPassword"
                         type="password"
+                        name="confirmPassword"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -184,9 +200,10 @@ const Registration = () => {
 
                 <button
                     type="submit"
+                    disabled={isSubmitting}
                     className="w-full py-2 px-4 bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
-                    Зарегистрироваться
+                    {isSubmitting ? 'Отправка...' : 'Зарегистрироваться'}
                 </button>
 
                 <p className="text-center text-sm mt-4">

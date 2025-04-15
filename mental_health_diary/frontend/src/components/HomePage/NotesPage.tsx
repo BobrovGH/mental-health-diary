@@ -77,8 +77,8 @@ const NotesPage: React.FC = () => {
       try {
         const data = await getUserNotes();
         setNotesByDate(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Неизвестная ошибка загрузки заметок');
       } finally {
         setLoading(false);
       }
@@ -88,11 +88,11 @@ const NotesPage: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <p>Загрузка...</p>;
+    return <div className="p-4 text-center">Загрузка заметок...</div>;
   }
 
   if (error) {
-    return <p>Ошибка: {error}</p>;
+    return <div className="p-4 text-red-500 text-center">{error}</div>;
   }
 
   if (Object.keys(notesByDate).length === 0) {
@@ -167,6 +167,7 @@ const NotesPage: React.FC = () => {
                             {note.emotions.length > 4 && (
                               <button
                               className="fa-solid fa-user px-2 py-1 bg-gray-200 text-white rounded-md hover:bg-gray-300"
+                              title="Ещё"
                               onClick={() => openModal(note, formatDateRU(date))}><FontAwesomeIcon icon={faEllipsis} /></button>
                             )}
                             </>
@@ -199,6 +200,7 @@ const NotesPage: React.FC = () => {
                             {note.influences.length > 3 && (
                               <button
                               className="fa-solid fa-user px-2 py-1 bg-gray-200 text-white rounded-md hover:bg-gray-300"
+                              title="Ещё"
                               onClick={() => openModal(note, formatDateRU(date))}><FontAwesomeIcon icon={faEllipsis} /></button>
                             )}
                             </>
@@ -213,9 +215,11 @@ const NotesPage: React.FC = () => {
                       <td className="p-2 flex gap-2">
                         <button
                           className="fa-solid fa-user px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                          title="Посмотреть"
                           onClick={() => openModal(note, formatDateRU(date))}><FontAwesomeIcon icon={faEye} /></button>
                         <button
                           className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                          title="Удалить"
                           onClick={() => handleDeleteNote(note.id)}><FontAwesomeIcon icon={faTrash} /></button></td>
                     </tr>
                   ))}

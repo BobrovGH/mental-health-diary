@@ -5,6 +5,7 @@ import ArtTherapyPage from './ArtTherapyPage';
 import AnalyticsPage from './AnalyticsPage';
 import UserPage from './UserPage';
 import CreatingNotesPage from './CreatingNotesPage';
+import LessonPage from './LessonPage';
 
 const HomePage: React.FC = () => {
 
@@ -18,6 +19,7 @@ const HomePage: React.FC = () => {
           <Route path="arttherapy" element={<ArtTherapyPage />} />
           <Route path="user" element={<UserPage />} />
           <Route path="notes/create" element={<CreatingNotesPage />} />
+          <Route path="arttherapy/:lessonId" element={<LessonPage />} />
         </Routes>
       </main>
     </div>

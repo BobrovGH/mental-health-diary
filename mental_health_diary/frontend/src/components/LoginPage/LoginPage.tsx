@@ -39,9 +39,9 @@ const LoginPage: React.FC = () => {
 
     return (
         <div className="flex justify-center items-start min-h-screen bg-gray-100 pt-24">
-            <div className="text-center w-full max-w-2xl px-4">
+            <div className="text-center w-full px-4">
                 <h1 className="text-3xl font-bold mb-2">Terapy</h1>
-                <p className="text-gray-600 mb-8 text-lg">
+                <p className="text-gray-600 mb-20 text-lg">
                     Terapy — место, где ты сможешь познакомиться с собой и своими чувствами
                 </p>
 

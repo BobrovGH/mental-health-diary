@@ -4,22 +4,43 @@ from rest_framework.response import Response
 from .models import Note, Mood, Emotion, Influence
 from rest_framework import status
 
+def build_absolute_url(url, request):
+    if url and request:
+        return request.build_absolute_uri(url)
+    return url
+
 # Create your views here.
 # get moods, emotions and influences to display at create note page
 @api_view(['GET'])
 def get_diary_data(request):
     moods = [{"id": mood.id, "name": mood.mood_name} for mood in Mood.objects.all()]
     
-    emotions = [{"id": emotion.id, "name": emotion.emotion_name, "type": emotion.emotion_type, "icon": emotion.icon.url if emotion.icon else None} for emotion in Emotion.objects.all()]
+    emotions = [{
+        "id": emotion.id, 
+        "name": emotion.emotion_name, 
+        "type": emotion.emotion_type, 
+        "icon": build_absolute_url(emotion.icon.url, request) if emotion.icon else None
+    } for emotion in Emotion.objects.all()]
     
     positive_emotions = [e for e in emotions if e["type"] == "Позитивные эмоции"]
     negative_emotions = [e for e in emotions if e["type"] == "Негативные эмоции"]
     energy = [e for e in emotions if e["type"] == "Энергия"]
 
-    influences = [{ "id": influence.id, "name": influence.influence_name, "type": influence.influence_type, "icon": influence.icon.url if influence.icon else None} for influence in Influence.objects.all()]
+    influences = [{
+        "id": influence.id, 
+        "name": influence.influence_name, 
+        "type": influence.influence_type, 
+        "icon": build_absolute_url(influence.icon.url, request) if influence.icon else None
+    } for influence in Influence.objects.all()]
 
-    return Response({"moods": moods, "positive_emotions": positive_emotions, "negative_emotions": negative_emotions, "energy": energy, "influences": influences})
-
+    return Response({
+        "moods": moods, 
+        "positive_emotions": positive_emotions, 
+        "negative_emotions": negative_emotions, 
+        "energy": energy, 
+        "influences": influences
+    })
+    
 # save data from create note page in the db
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -78,8 +99,14 @@ def get_user_notes(request):
             "id": note.id,
             "time": str(note.time)[:-3] if note.time else None,  # Time is already in HH:MM:SS format
             "mood": note.mood.mood_name if note.mood else None,
-            "emotions": [{"name": emotion.emotion_name, "icon": emotion.icon.url} for emotion in note.emotions.all()],
-            "influences": [{"name": influence.influence_name, "icon": influence.icon.url} for influence in note.influences.all()],
+            "emotions": [{
+                "name": emotion.emotion_name, 
+                "icon": build_absolute_url(emotion.icon.url, request) if emotion.icon else None
+            } for emotion in note.emotions.all()],
+            "influences": [{
+                "name": influence.influence_name, 
+                "icon": build_absolute_url(influence.icon.url, request) if influence.icon else None
+            } for influence in note.influences.all()],
             "text_note": note.text_note,
         })
 
@@ -89,7 +116,6 @@ def get_user_notes(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_note(request, note_id):
-    print(note_id)
     note = Note.objects.get(id=note_id)
     note.delete()
     

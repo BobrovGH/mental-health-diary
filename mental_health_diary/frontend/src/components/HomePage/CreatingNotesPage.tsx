@@ -153,7 +153,7 @@ const CreatingNotesPage: React.FC = () => {
         {selectedMoodType === 'with a timestamp' && (
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-2">
-              <label className="text-sm font-medium text-gray-700">Выберите время</label>
+              <label className="text-md font-semibold">Выберите время</label>
               <input
                 type="time"
                 value={selectedTime}
@@ -172,13 +172,12 @@ const CreatingNotesPage: React.FC = () => {
               )}
             </div>
           </div>
-        )
-        }
+        )}
       </div>
 
       {/* Mood */}
       < div className="mb-4" >
-        <label className="text-md font-semibold mb-2">Настроение</label>
+        <label className="text-md font-semibold mb-2">Настроение </label>
         <select
           value={selectedMood}
           onChange={(e) => setSelectedMood(e.target.value)}
@@ -285,8 +284,8 @@ const CreatingNotesPage: React.FC = () => {
           type="button"
           onClick={handleAddNote}
           className={`px-4 py-2 text-white font-semibold rounded-md focus:outline-none ${!selectedMood || selectedEmotions.length === 0
-              ? 'bg-orange-300'
-              : 'bg-orange-500 hover:bg-orange-600'
+            ? 'bg-orange-300'
+            : 'bg-orange-500 hover:bg-orange-600'
             }`}
           disabled={!selectedMood || selectedEmotions.length === 0}
         >

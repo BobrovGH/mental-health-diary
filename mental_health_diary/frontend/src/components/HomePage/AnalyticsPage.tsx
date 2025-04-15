@@ -16,21 +16,24 @@ const AnalyticsPage: React.FC = () => {
   const [chartEndDate, setChartEndDate] = useState(today);
   const [hasNotes, setHasNotes] = useState<boolean | null>(null);
   const [notesInPeriod, setNotesInPeriod] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch user's oldest note date, if there's no any notes date is ""
   useEffect(() => {
     const fetchOldestNoteDate = async () => {
       try {
         const data = await getOldestNoteDate();
-        console.log(`date of the oldest user's note: ${JSON.stringify(data)}`);
         if (data.oldestNoteDate) {
           setUserOldestNoteDate(data.oldestNoteDate);
           setHasNotes(true);
         } else {
           setHasNotes(false);
         }
-      } catch (error) {
-        console.error("Error fetching oldest note date:", error);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Неизвестная ошибка загрузки аналитики');
+      } finally {
+        setLoading(false);
       }
     };
     fetchOldestNoteDate();
@@ -85,6 +88,14 @@ const AnalyticsPage: React.FC = () => {
     setChartEndDate(endDate);
   };
 
+  if (loading) {
+    return <div className="p-4 text-center">Загрузка уроков...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-red-500 text-center">{error}</div>;
+  }
+
   // User has no notes
   if (hasNotes === false) {
     return (
@@ -103,7 +114,6 @@ const AnalyticsPage: React.FC = () => {
     return (
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <h2 className="text-2xl font-semibold mb-4">Аналитика</h2>
-        <p className="mb-4">Нет заметок для выбранного периода</p>
         <div className="flex items-center space-x-4 mb-4">
           <input
             type="date"
@@ -134,6 +144,7 @@ const AnalyticsPage: React.FC = () => {
             Обновить график
           </button>
         </div>
+        <p className="mb-4">Нет заметок для выбранного периода</p>
       </div>
     );
   }
@@ -174,6 +185,7 @@ const AnalyticsPage: React.FC = () => {
             Обновить график
           </button>
         </div>
+        
       </div>
 
       {/* Charts */}
@@ -196,7 +208,6 @@ const AnalyticsPage: React.FC = () => {
           <EmotionPieChart type="Негативные эмоции" startDate={chartStartDate} endDate={chartEndDate} />
         </div>
       </div>
-
     </div>
   );
 };

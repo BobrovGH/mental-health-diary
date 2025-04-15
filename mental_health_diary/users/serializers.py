@@ -10,7 +10,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ['username', 'first_name', 'last_name', 'email', 'date_joined', 'profile_pic']
 
     def get_profile_pic(self, obj):
+        request = self.context.get('request')
         try:
-            return obj.profilepic.profile_pic.url
+            if obj.profilepic.profile_pic:
+                url = obj.profilepic.profile_pic.url
+                return request.build_absolute_uri(url) if request else url
         except ProfilePic.DoesNotExist:
             return None
+        return None

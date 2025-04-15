@@ -46,6 +46,12 @@ export const getMoodTrends = (startDate: string, endDate: string) => fetchData(`
 export const getEmotionAnalysis = (type: string, startDate: string, endDate: string) => fetchData(`analytics/emotion-analysis/?type=${type}&startDate=${startDate}&endDate=${endDate}`);
 export const getOldestNoteDate = () => fetchData('analytics/oldest-note/');
 
+// ArtTherapy API
+export const getLessons = () => fetchData("art_therapy/lessons/");
+export const getLessonById = (id: string | number) => fetchData(`art_therapy/lessons/${id}/`);
+export const toggleFavorite = (lessonId: number) => fetchData(`art_therapy/lessons/${lessonId}/favorite/`, "POST");
+export const markCompleted = (lessonId: number) => fetchData(`art_therapy/lessons/${lessonId}/complete/`, "POST");
+
 export const registerUser = async (formData: FormData) => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/users/register/`, {

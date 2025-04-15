@@ -46,11 +46,13 @@ INSTALLED_APPS = [
     'users', #signup, signin, reset password, account page
     'diary', #taking and storing notes
     'analytics', #gather and analize data
+    'art_therapy', #lessons of art therapy
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -134,6 +136,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  #Vite dev server
+    'http://localhost:4173', #Productin server
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -155,6 +158,8 @@ SIMPLE_JWT = {
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+WHITENOISE_AUTOREFRESH = True 
 
 GRAPH_MODELS = {
   'all_applications': True,
